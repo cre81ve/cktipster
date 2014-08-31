@@ -14,10 +14,20 @@ class SettingsViewController: UIViewController , UIPickerViewDelegate{
     
     @IBOutlet weak var defaultTipPicker: UIPickerView!
     
+    @IBOutlet weak var resetSoFar: UIButton!
     @IBOutlet weak var defaultShares: UITextField!
     
     var tipsSelected=["18%","20%","22%"]
     
+    @IBAction func resetSoFarTipsToZero(sender: AnyObject) {
+        var defaults = NSUserDefaults.standardUserDefaults()
+
+        var soFar = defaults.doubleForKey("so_far_tipped")
+        defaults.setDouble(0.00, forKey: "so_far_tipped")
+            
+    
+
+    }
     // returns the number of 'columns' to display.
      func numberOfComponentsInPickerView(pickerView: UIPickerView!) -> Int {
         return 1
@@ -30,6 +40,7 @@ class SettingsViewController: UIViewController , UIPickerViewDelegate{
         var defaults = NSUserDefaults.standardUserDefaults()
         var ds:NSString = defaultShares.text
         var dsint = ds.integerValue
+        if(dsint > 15) {defaultShares.text = "1"}
         defaults.setInteger(dsint, forKey: "default_share_selected")
         defaults.synchronize()
 

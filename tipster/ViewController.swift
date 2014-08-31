@@ -10,19 +10,50 @@ import UIKit
 
 class ViewController: UIViewController , UIPickerViewDelegate {
     
+  
+    @IBOutlet weak var clearButton: UIButton!
     @IBOutlet weak var tipLabel: UILabel!
     @IBOutlet weak var billAmountField: UITextField!
     @IBOutlet weak var totalLabel: UILabel!
     
     @IBOutlet weak var tipControl: UISegmentedControl!
     
+    @IBOutlet weak var tippedButton: UIButton!
     @IBOutlet weak var numOfPeople: UIPickerView!
     
+    @IBOutlet weak var soFarTipped: UILabel!
+    
+    
+    var tipAmount = 0.00
+    
+    @IBAction func onTippedConfirm(sender: AnyObject) {
+        
+        var defaults = NSUserDefaults.standardUserDefaults()
+        var soFar = defaults.doubleForKey("so_far_tipped")
+        if(soFar > 0.00) {
+            soFar = soFar + tipAmount;
+            defaults.setDouble(soFar, forKey: "so_far_tipped")
+        }else {
+            soFar = tipAmount
+            defaults.setDouble(soFar, forKey: "so_far_tipped")
+
+        }
+        defaults.synchronize()
+        
+        renderSoFar()
+
+        
+    }
+    
+  
     @IBOutlet weak var perEach: UILabel!
     var peopleArray=["1","2","3","4","5","6","7","8","9","10","11","12","13","14","15"]
 
     var currentNumberOfPeople=0
-    
+    @IBAction func onClear(sender: AnyObject) {
+        billAmountField.text = ""
+        reCalculate();
+    }
     // returns the number of 'columns' to display.
     func numberOfComponentsInPickerView(pickerView: UIPickerView!) -> Int {
         return 1
@@ -42,6 +73,9 @@ class ViewController: UIViewController , UIPickerViewDelegate {
         reCalculate()
     }
     
+  
+
+    
     
     
     @IBAction func onEditingChanged(sender: AnyObject) {
@@ -50,6 +84,7 @@ class ViewController: UIViewController , UIPickerViewDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         reset()
+        
         
     }
 
@@ -83,12 +118,13 @@ class ViewController: UIViewController , UIPickerViewDelegate {
             totalLabel.text = String(format: "$%.2f", totalVal)
             tipLabel.text = String(format: "$%.2f", tip)
             var defaults = NSUserDefaults.standardUserDefaults()
-            
+            tipAmount = tip
             defaults.setDouble(dblBillEntered, forKey: "last_bill_selected")
             defaults.synchronize()
         }
         var per=totalVal/Double(currentNumberOfPeople+1)
         perEach.text = String(format: "$%.2f", per);
+        
         
     }
     
@@ -108,9 +144,22 @@ class ViewController: UIViewController , UIPickerViewDelegate {
         if(lbs > 0 ){
             billAmountField.text = String (format: "%.2f", lbs);
         }
-        reCalculate();
+        
+        reCalculate()
+        renderSoFar()
 
 
+    }
+    
+    
+    func renderSoFar() {
+        var defaults = NSUserDefaults.standardUserDefaults()
+        var soFar = defaults.doubleForKey("so_far_tipped")
+        if(soFar > 0.00) {
+            soFarTipped.text = String (format: "$%.2f" ,soFar);
+        }else {
+            soFarTipped.text = "$0.00";
+        }
     }
 }
 
